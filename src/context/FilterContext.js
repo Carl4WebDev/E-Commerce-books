@@ -1,0 +1,4 @@
+
+const filterInitialState = {
+    productList: [],
+}
