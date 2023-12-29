@@ -24,7 +24,7 @@ export const DropdownLoggedIn = ({SetDropdown}) => {
             }
         }
         fetchData();
-    }, [])
+    }, []) //eslint-disable-line
 
     function handleLogout(){
         logout()
