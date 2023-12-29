@@ -1,15 +1,14 @@
 
 import {useNavigate} from "react-router-dom";
 
-
 export const Search = ({setShowSearchBar}) => {
   
   const navigate = useNavigate();
-
   const handleSearch = (event) => {
     event.preventDefault();
     const queryTerm = event.target.products.value;
     setShowSearchBar(false)
+
 
     return navigate(`/products?q=${queryTerm}`); 
   }

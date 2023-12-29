@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import Logo from "../../assets/logo.png";
 
 import { Search } from "../Sections/Search";
-import { Link } from "react-router-dom";
+import { Link, json } from "react-router-dom";
+
+import { DropdownLoggedOut,DropdownLoggedIn } from "../index"
+import { useCart } from "../../context/CartContext";
 
 export const Header = () => {
-    const [darkmode, setDarkmode] = useState(JSON.parse(localStorage.getItem("darkmode")) || false);
+    const {cartList} = useCart()
 
     const [showSearchBar, setShowSearchBar] = useState(false);
+    const [darkmode, setDarkmode] = useState(JSON.parse(localStorage.getItem("darkmode")) || false);
+
+    const token = JSON.parse(sessionStorage.getItem("token"));
 
     useEffect(() => {
         localStorage.setItem("darkmode", JSON.stringify(darkmode))
@@ -18,6 +24,8 @@ export const Header = () => {
             document.documentElement.classList.remove('dark');
         }
     }, [darkmode])
+
+    const [dropdown, SetDropdown] = useState(false);
 
 
 
@@ -34,15 +42,15 @@ export const Header = () => {
                     <span onClick={() => setShowSearchBar(!showSearchBar)} className="cursor-pointer text-xl text-gray-700 dark:text-white mr-5 bi bi-search"></span>
                     <Link to="/cart" className="text-gray-700 dark:text-white mr-5">
                     <span className="text-2xl bi bi-cart-fill relative">
-                        <span className="text-white text-sm absolute -top-1 left-2.5 bg-rose-500 px-1 rounded-full">0</span>
+                        <span className="text-white text-sm absolute -top-1 left-2.5 bg-rose-500 px-1 rounded-full">{cartList.length}</span>
                     </span>                    
                     </Link>
-                    <span className="bi bi-person-circle cursor-pointer text-2xl text-gray-700 dark:text-white"></span>
+                    <span onClick={() => SetDropdown(!dropdown)} className="bi bi-person-circle cursor-pointer text-2xl text-gray-700 dark:text-white"></span>
+                    { dropdown && ( token ? <DropdownLoggedIn SetDropdown={SetDropdown}/> : <DropdownLoggedOut SetDropdown={SetDropdown} />)}
                 </div>
             </div>
         </nav>
         { showSearchBar &&  <Search setShowSearchBar={setShowSearchBar}/>}
-
     </header>
   )
 }

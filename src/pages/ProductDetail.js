@@ -1,24 +1,43 @@
-import { useState, useEffect } from "react";
-import { Rating } from "../components";
+import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
-import { Title } from "../hooks";
+import { Title } from "../hooks/Title";
+import { Rating } from "../components";
+import { useCart } from "../context";
+import { getProductDetail } from "../services";
+import { toast } from "react-toastify";
 
-
-export const ProductDetail = ({title}) => {
-  
+export const ProductDetail = () => {
+  const { cartList, addToCart, removeFromCart } = useCart();
+  const [inCart, setInCart] = useState(false);
   const [product, setProduct] = useState({});
-  const {id} = useParams();
+  const { id } = useParams();
+  Title(product.name);
   
   useEffect(() => {
-        async function fetchProduct() {
-          const response = await fetch(`http://localhost:3000/products/${id}`);
-          const data = await response.json();
-          setProduct(data);
-        
-        }
-        fetchProduct()
-      }, [id])
-  Title(`Title: ${product.name}-${product.id}`)
+    async function fetchProducts(){
+      try{
+
+        const data = await getProductDetail(id);
+        setProduct(data);
+      }
+      catch(error) {
+        toast.error(error.message)
+      }
+    }
+    fetchProducts();
+  }, [id]);
+
+  useEffect(() => {
+    const productInCart = cartList.find(item => item.id === product.id);
+
+    if(productInCart){
+        setInCart(true);
+    } else {
+        setInCart(false);
+    }
+
+  }, [cartList, product.id]);
+
   return (
     <main>
         <section>
@@ -35,26 +54,18 @@ export const ProductDetail = ({title}) => {
               </p>
               <p className="my-3"> 
                 <span>
-                  <Rating rating={product.rating}/>
+                  <Rating rating={product.rating} />
                 </span>
               </p>
               <p className="my-4 select-none">
-                {product.best_seller && <span className="font-semibold text-amber-500 border bg-amber-50 rounded-lg px-3 py-1 mr-2">BEST SELLER</span> }   
-                {product.in_stock ?
-                  (
-                    <span className="font-semibold text-emerald-600	border bg-slate-100 rounded-lg px-3 py-1 mr-2">INSTOCK</span>
-                  )
-                  :
-                  (
-                    <span className="font-semibold text-rose-700 border bg-slate-100 rounded-lg px-3 py-1 mr-2">OUT OF STOCK</span>
-                  ) 
-                }
-                
+                { product.best_seller && <span className="font-semibold text-amber-500 border bg-amber-50 rounded-lg px-3 py-1 mr-2">BEST SELLER</span> }
+                { product.in_stock && <span className="font-semibold text-emerald-600	border bg-slate-100 rounded-lg px-3 py-1 mr-2">INSTOCK</span> }
+                { !product.in_stock && <span className="font-semibold text-rose-700 border bg-slate-100 rounded-lg px-3 py-1 mr-2">OUT OF STOCK</span> }
                 <span className="font-semibold text-blue-500 border bg-slate-100 rounded-lg px-3 py-1 mr-2">{product.size} MB</span>
               </p>
               <p className="my-3">
-                <button className={`inline-flex items-center py-2 px-5 text-lg font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800`}>Add To Cart <i className="ml-1 bi bi-plus-lg"></i></button>
-                {/* <button className={`inline-flex items-center py-2 px-5 text-lg font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800`}  disabled={ product.in_stock ? "" : "disabled" }>Remove Item <i className="ml-1 bi bi-trash3"></i></button> */}
+                { !inCart && <button onClick={() => addToCart(product)} disabled={ product.in_stock ? "" : "disabled"} className={`inline-flex items-center py-2 px-5 text-lg font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 ${product.in_stock ? "" : "bg-slate-50 hover:bg-slate-50"}`}>Add To Cart <i className="ml-1 bi bi-plus-lg"></i></button> } 
+                { inCart && <button onClick={() => removeFromCart(product)} disabled={ product.in_stock ? "" : "disabled"} className={`inline-flex items-center py-2 px-5 text-lg font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800 ${product.in_stock ? "" : "bg-slate-50 hover:bg-slate-50"}`}  >Remove Item <i className="ml-1 bi bi-trash3"></i></button> }  
               </p>
               <p className="text-lg text-gray-900 dark:text-slate-200">
                 {product.long_description}
