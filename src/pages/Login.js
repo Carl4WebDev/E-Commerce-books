@@ -31,8 +31,8 @@ export const Login = ({title}) => {
   }
 
   async function handleLoginGuess() {
-    email.current.value = "carl027@gmail.com"
-    password.current.value = "1234567"
+    email.current.value = process.env.REACT_APP_GUESS_LOGIN
+    password.current.value = process.env.REACT_APP_GUESS_PASSWORD
 
 
     try{
