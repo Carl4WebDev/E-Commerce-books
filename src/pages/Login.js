@@ -34,18 +34,18 @@ export const Login = ({title}) => {
     email.current.value = process.env.REACT_APP_GUESS_LOGIN
     password.current.value = process.env.REACT_APP_GUESS_PASSWORD
 
-
     try{
-
       const authDetail = {
         email: email.current.value,
         password: password.current.value,
       }
-  
+
       const data = await login(authDetail)
       data.accessToken ? navigate("/products") : toast.error(data);
+
     }
     catch(error) {
+
       toast.error(error.message) //API error
     }
 
